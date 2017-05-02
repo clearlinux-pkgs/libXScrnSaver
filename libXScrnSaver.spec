@@ -4,7 +4,7 @@
 #
 Name     : libXScrnSaver
 Version  : 1.2.2
-Release  : 1
+Release  : 2
 URL      : https://www.x.org/releases/individual/lib/libXScrnSaver-1.2.2.tar.gz
 Source0  : https://www.x.org/releases/individual/lib/libXScrnSaver-1.2.2.tar.gz
 Summary  : The XScrnSaver Library
