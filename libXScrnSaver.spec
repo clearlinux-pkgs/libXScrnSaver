@@ -6,16 +6,15 @@
 #
 Name     : libXScrnSaver
 Version  : 1.2.3
-Release  : 6
+Release  : 7
 URL      : https://www.x.org/releases/individual/lib/libXScrnSaver-1.2.3.tar.gz
 Source0  : https://www.x.org/releases/individual/lib/libXScrnSaver-1.2.3.tar.gz
-Source99 : https://www.x.org/releases/individual/lib/libXScrnSaver-1.2.3.tar.gz.sig
+Source1 : https://www.x.org/releases/individual/lib/libXScrnSaver-1.2.3.tar.gz.sig
 Summary  : The XScrnSaver Library
 Group    : Development/Tools
 License  : MIT-Opengroup
-Requires: libXScrnSaver-lib
-Requires: libXScrnSaver-license
-Requires: libXScrnSaver-man
+Requires: libXScrnSaver-lib = %{version}-%{release}
+Requires: libXScrnSaver-license = %{version}-%{release}
 BuildRequires : gcc-dev32
 BuildRequires : gcc-libgcc32
 BuildRequires : gcc-libstdc++32
@@ -41,8 +40,9 @@ Xorg mailing list:
 %package dev
 Summary: dev components for the libXScrnSaver package.
 Group: Development
-Requires: libXScrnSaver-lib
-Provides: libXScrnSaver-devel
+Requires: libXScrnSaver-lib = %{version}-%{release}
+Provides: libXScrnSaver-devel = %{version}-%{release}
+Requires: libXScrnSaver = %{version}-%{release}
 
 %description dev
 dev components for the libXScrnSaver package.
@@ -51,8 +51,8 @@ dev components for the libXScrnSaver package.
 %package dev32
 Summary: dev32 components for the libXScrnSaver package.
 Group: Default
-Requires: libXScrnSaver-lib32
-Requires: libXScrnSaver-dev
+Requires: libXScrnSaver-lib32 = %{version}-%{release}
+Requires: libXScrnSaver-dev = %{version}-%{release}
 
 %description dev32
 dev32 components for the libXScrnSaver package.
@@ -61,7 +61,7 @@ dev32 components for the libXScrnSaver package.
 %package lib
 Summary: lib components for the libXScrnSaver package.
 Group: Libraries
-Requires: libXScrnSaver-license
+Requires: libXScrnSaver-license = %{version}-%{release}
 
 %description lib
 lib components for the libXScrnSaver package.
@@ -70,7 +70,7 @@ lib components for the libXScrnSaver package.
 %package lib32
 Summary: lib32 components for the libXScrnSaver package.
 Group: Default
-Requires: libXScrnSaver-license
+Requires: libXScrnSaver-license = %{version}-%{release}
 
 %description lib32
 lib32 components for the libXScrnSaver package.
@@ -84,14 +84,6 @@ Group: Default
 license components for the libXScrnSaver package.
 
 
-%package man
-Summary: man components for the libXScrnSaver package.
-Group: Default
-
-%description man
-man components for the libXScrnSaver package.
-
-
 %prep
 %setup -q -n libXScrnSaver-1.2.3
 pushd ..
@@ -102,31 +94,42 @@ popd
 export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
-export LANG=C
-export SOURCE_DATE_EPOCH=1530837318
+export LANG=C.UTF-8
+export SOURCE_DATE_EPOCH=1569535478
+export GCC_IGNORE_WERROR=1
+export AR=gcc-ar
+export RANLIB=gcc-ranlib
+export NM=gcc-nm
+export CFLAGS="$CFLAGS -O3 -ffat-lto-objects -flto=4 "
+export FCFLAGS="$CFLAGS -O3 -ffat-lto-objects -flto=4 "
+export FFLAGS="$CFLAGS -O3 -ffat-lto-objects -flto=4 "
+export CXXFLAGS="$CXXFLAGS -O3 -ffat-lto-objects -flto=4 "
 %configure --disable-static
 make  %{?_smp_mflags}
 
 pushd ../build32/
 export PKG_CONFIG_PATH="/usr/lib32/pkgconfig"
-export CFLAGS="$CFLAGS -m32"
-export CXXFLAGS="$CXXFLAGS -m32"
-export LDFLAGS="$LDFLAGS -m32"
+export ASFLAGS="${ASFLAGS}${ASFLAGS:+ }--32"
+export CFLAGS="${CFLAGS}${CFLAGS:+ }-m32 -mstackrealign"
+export CXXFLAGS="${CXXFLAGS}${CXXFLAGS:+ }-m32 -mstackrealign"
+export LDFLAGS="${LDFLAGS}${LDFLAGS:+ }-m32 -mstackrealign"
 %configure --disable-static    --libdir=/usr/lib32 --build=i686-generic-linux-gnu --host=i686-generic-linux-gnu --target=i686-clr-linux-gnu
 make  %{?_smp_mflags}
 popd
 %check
-export LANG=C
+export LANG=C.UTF-8
 export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 make VERBOSE=1 V=1 %{?_smp_mflags} check
+cd ../build32;
+make VERBOSE=1 V=1 %{?_smp_mflags} check || :
 
 %install
-export SOURCE_DATE_EPOCH=1530837318
+export SOURCE_DATE_EPOCH=1569535478
 rm -rf %{buildroot}
-mkdir -p %{buildroot}/usr/share/doc/libXScrnSaver
-cp COPYING %{buildroot}/usr/share/doc/libXScrnSaver/COPYING
+mkdir -p %{buildroot}/usr/share/package-licenses/libXScrnSaver
+cp COPYING %{buildroot}/usr/share/package-licenses/libXScrnSaver/COPYING
 pushd ../build32/
 %make_install32
 if [ -d  %{buildroot}/usr/lib32/pkgconfig ]
@@ -146,6 +149,18 @@ popd
 /usr/include/X11/extensions/scrnsaver.h
 /usr/lib64/libXss.so
 /usr/lib64/pkgconfig/xscrnsaver.pc
+/usr/share/man/man3/XScreenSaverAllocInfo.3
+/usr/share/man/man3/XScreenSaverGetRegistered.3
+/usr/share/man/man3/XScreenSaverQueryExtension.3
+/usr/share/man/man3/XScreenSaverQueryInfo.3
+/usr/share/man/man3/XScreenSaverQueryVersion.3
+/usr/share/man/man3/XScreenSaverRegister.3
+/usr/share/man/man3/XScreenSaverSelectInput.3
+/usr/share/man/man3/XScreenSaverSetAttributes.3
+/usr/share/man/man3/XScreenSaverSuspend.3
+/usr/share/man/man3/XScreenSaverUnregister.3
+/usr/share/man/man3/XScreenSaverUnsetAttributes.3
+/usr/share/man/man3/Xss.3
 
 %files dev32
 %defattr(-,root,root,-)
@@ -164,20 +179,5 @@ popd
 /usr/lib32/libXss.so.1.0.0
 
 %files license
-%defattr(-,root,root,-)
-/usr/share/doc/libXScrnSaver/COPYING
-
-%files man
-%defattr(-,root,root,-)
-/usr/share/man/man3/XScreenSaverAllocInfo.3
-/usr/share/man/man3/XScreenSaverGetRegistered.3
-/usr/share/man/man3/XScreenSaverQueryExtension.3
-/usr/share/man/man3/XScreenSaverQueryInfo.3
-/usr/share/man/man3/XScreenSaverQueryVersion.3
-/usr/share/man/man3/XScreenSaverRegister.3
-/usr/share/man/man3/XScreenSaverSelectInput.3
-/usr/share/man/man3/XScreenSaverSetAttributes.3
-/usr/share/man/man3/XScreenSaverSuspend.3
-/usr/share/man/man3/XScreenSaverUnregister.3
-/usr/share/man/man3/XScreenSaverUnsetAttributes.3
-/usr/share/man/man3/Xss.3
+%defattr(0644,root,root,0755)
+/usr/share/package-licenses/libXScrnSaver/COPYING
