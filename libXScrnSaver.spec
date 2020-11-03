@@ -6,10 +6,10 @@
 #
 Name     : libXScrnSaver
 Version  : 1.2.3
-Release  : 7
+Release  : 8
 URL      : https://www.x.org/releases/individual/lib/libXScrnSaver-1.2.3.tar.gz
 Source0  : https://www.x.org/releases/individual/lib/libXScrnSaver-1.2.3.tar.gz
-Source1 : https://www.x.org/releases/individual/lib/libXScrnSaver-1.2.3.tar.gz.sig
+Source1  : https://www.x.org/releases/individual/lib/libXScrnSaver-1.2.3.tar.gz.sig
 Summary  : The XScrnSaver Library
 Group    : Development/Tools
 License  : MIT-Opengroup
@@ -86,6 +86,7 @@ license components for the libXScrnSaver package.
 
 %prep
 %setup -q -n libXScrnSaver-1.2.3
+cd %{_builddir}/libXScrnSaver-1.2.3
 pushd ..
 cp -a libXScrnSaver-1.2.3 build32
 popd
@@ -95,14 +96,14 @@ export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C.UTF-8
-export SOURCE_DATE_EPOCH=1569535478
+export SOURCE_DATE_EPOCH=1604442350
 export GCC_IGNORE_WERROR=1
 export AR=gcc-ar
 export RANLIB=gcc-ranlib
 export NM=gcc-nm
 export CFLAGS="$CFLAGS -O3 -ffat-lto-objects -flto=4 "
-export FCFLAGS="$CFLAGS -O3 -ffat-lto-objects -flto=4 "
-export FFLAGS="$CFLAGS -O3 -ffat-lto-objects -flto=4 "
+export FCFLAGS="$FFLAGS -O3 -ffat-lto-objects -flto=4 "
+export FFLAGS="$FFLAGS -O3 -ffat-lto-objects -flto=4 "
 export CXXFLAGS="$CXXFLAGS -O3 -ffat-lto-objects -flto=4 "
 %configure --disable-static
 make  %{?_smp_mflags}
@@ -121,15 +122,15 @@ export LANG=C.UTF-8
 export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
-make VERBOSE=1 V=1 %{?_smp_mflags} check
+make %{?_smp_mflags} check
 cd ../build32;
-make VERBOSE=1 V=1 %{?_smp_mflags} check || :
+make %{?_smp_mflags} check || :
 
 %install
-export SOURCE_DATE_EPOCH=1569535478
+export SOURCE_DATE_EPOCH=1604442350
 rm -rf %{buildroot}
 mkdir -p %{buildroot}/usr/share/package-licenses/libXScrnSaver
-cp COPYING %{buildroot}/usr/share/package-licenses/libXScrnSaver/COPYING
+cp %{_builddir}/libXScrnSaver-1.2.3/COPYING %{buildroot}/usr/share/package-licenses/libXScrnSaver/dcc7cc194ef7fcd3e5f8e9bc20ddad371ee1d36c
 pushd ../build32/
 %make_install32
 if [ -d  %{buildroot}/usr/lib32/pkgconfig ]
@@ -180,4 +181,4 @@ popd
 
 %files license
 %defattr(0644,root,root,0755)
-/usr/share/package-licenses/libXScrnSaver/COPYING
+/usr/share/package-licenses/libXScrnSaver/dcc7cc194ef7fcd3e5f8e9bc20ddad371ee1d36c
