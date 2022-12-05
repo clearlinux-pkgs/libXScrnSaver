@@ -6,7 +6,7 @@
 #
 Name     : libXScrnSaver
 Version  : 1.2.3
-Release  : 8
+Release  : 9
 URL      : https://www.x.org/releases/individual/lib/libXScrnSaver-1.2.3.tar.gz
 Source0  : https://www.x.org/releases/individual/lib/libXScrnSaver-1.2.3.tar.gz
 Source1  : https://www.x.org/releases/individual/lib/libXScrnSaver-1.2.3.tar.gz.sig
@@ -96,20 +96,20 @@ export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C.UTF-8
-export SOURCE_DATE_EPOCH=1604442350
+export SOURCE_DATE_EPOCH=1670224162
 export GCC_IGNORE_WERROR=1
 export AR=gcc-ar
 export RANLIB=gcc-ranlib
 export NM=gcc-nm
-export CFLAGS="$CFLAGS -O3 -ffat-lto-objects -flto=4 "
-export FCFLAGS="$FFLAGS -O3 -ffat-lto-objects -flto=4 "
-export FFLAGS="$FFLAGS -O3 -ffat-lto-objects -flto=4 "
-export CXXFLAGS="$CXXFLAGS -O3 -ffat-lto-objects -flto=4 "
+export CFLAGS="$CFLAGS -O3 -ffat-lto-objects -flto=auto "
+export FCFLAGS="$FFLAGS -O3 -ffat-lto-objects -flto=auto "
+export FFLAGS="$FFLAGS -O3 -ffat-lto-objects -flto=auto "
+export CXXFLAGS="$CXXFLAGS -O3 -ffat-lto-objects -flto=auto "
 %configure --disable-static
 make  %{?_smp_mflags}
 
 pushd ../build32/
-export PKG_CONFIG_PATH="/usr/lib32/pkgconfig"
+export PKG_CONFIG_PATH="/usr/lib32/pkgconfig:/usr/share/pkgconfig"
 export ASFLAGS="${ASFLAGS}${ASFLAGS:+ }--32"
 export CFLAGS="${CFLAGS}${CFLAGS:+ }-m32 -mstackrealign"
 export CXXFLAGS="${CXXFLAGS}${CXXFLAGS:+ }-m32 -mstackrealign"
@@ -127,15 +127,21 @@ cd ../build32;
 make %{?_smp_mflags} check || :
 
 %install
-export SOURCE_DATE_EPOCH=1604442350
+export SOURCE_DATE_EPOCH=1670224162
 rm -rf %{buildroot}
 mkdir -p %{buildroot}/usr/share/package-licenses/libXScrnSaver
-cp %{_builddir}/libXScrnSaver-1.2.3/COPYING %{buildroot}/usr/share/package-licenses/libXScrnSaver/dcc7cc194ef7fcd3e5f8e9bc20ddad371ee1d36c
+cp %{_builddir}/libXScrnSaver-%{version}/COPYING %{buildroot}/usr/share/package-licenses/libXScrnSaver/dcc7cc194ef7fcd3e5f8e9bc20ddad371ee1d36c
 pushd ../build32/
 %make_install32
 if [ -d  %{buildroot}/usr/lib32/pkgconfig ]
 then
 pushd %{buildroot}/usr/lib32/pkgconfig
+for i in *.pc ; do ln -s $i 32$i ; done
+popd
+fi
+if [ -d %{buildroot}/usr/share/pkgconfig ]
+then
+pushd %{buildroot}/usr/share/pkgconfig
 for i in *.pc ; do ln -s $i 32$i ; done
 popd
 fi
